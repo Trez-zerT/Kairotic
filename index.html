@@ -16,9 +16,9 @@
 <div id="app">
   <div id="toast"></div>
   <div id="install-banner">
-    <span>Add to Home Screen for quick access</span>
+    <span data-i18n="install_banner">Add to Home Screen for quick access</span>
     <button class="dismiss-btn" id="install-dismiss">&times;</button>
-    <button id="install-btn">Install</button>
+    <button id="install-btn" data-i18n="install">Install</button>
   </div>
   <div id="screens">
     <div id="screen-timer" class="screen active">
@@ -27,31 +27,31 @@
         <span id="timer-comment" class="comment-badge"></span>
       </div>
       <div id="timer-display" class="timer-display">00:00:00</div>
-      <div id="timer-status" class="timer-status">Ready</div>
+      <div id="timer-status" class="timer-status" data-i18n="status_ready">Ready</div>
       <div id="today-total" class="today-total"></div>
       <div class="timer-controls" id="timer-controls-start">
-        <button class="btn btn-start" id="btn-start">Start</button>
+        <button class="btn btn-start" id="btn-start" data-i18n="start">Start</button>
       </div>
       <div class="comment-selector hidden" id="start-comment-selector">
-        <input type="text" id="start-comment-input" placeholder="Task description (default: work)" autocomplete="off">
-        <input type="text" id="start-time-input" placeholder="Start time (optional: HH:MM)" inputmode="numeric" style="margin-top:8px">
+        <input type="text" id="start-comment-input" data-i18n-placeholder="placeholder_comment" placeholder="Task description (default: work)" autocomplete="off">
+        <input type="text" id="start-time-input" data-i18n-placeholder="placeholder_start_time" placeholder="Start time (optional: HH:MM)" inputmode="numeric" style="margin-top:8px">
         <div id="start-comment-suggestions" class="suggestions"></div>
         <div class="selector-actions">
-          <button class="btn btn-sm" id="btn-start-confirm">Start Timer</button>
-          <button class="btn btn-sm btn-secondary" id="btn-start-cancel">Cancel</button>
+          <button class="btn btn-sm" id="btn-start-confirm" data-i18n="start_timer">Start Timer</button>
+          <button class="btn btn-sm btn-secondary" id="btn-start-cancel" data-i18n="cancel">Cancel</button>
         </div>
       </div>
       <div class="timer-controls hidden" id="timer-controls-running">
-        <button class="btn btn-pause" id="btn-pause">Pause</button>
-        <button class="btn btn-stop" id="btn-stop">Stop</button>
-        <button class="btn btn-task" id="btn-task">Switch Task</button>
+        <button class="btn btn-pause" id="btn-pause" data-i18n="pause">Pause</button>
+        <button class="btn btn-stop" id="btn-stop" data-i18n="stop">Stop</button>
+        <button class="btn btn-task" id="btn-task" data-i18n="switch_task">Switch Task</button>
       </div>
       <div class="task-selector hidden" id="task-selector">
-        <input type="text" id="task-input" placeholder="Task description (default: work)" autocomplete="off">
+        <input type="text" id="task-input" data-i18n-placeholder="placeholder_task" placeholder="Task description (default: work)" autocomplete="off">
         <div id="task-suggestions" class="suggestions"></div>
         <div class="task-actions">
-          <button class="btn btn-sm" id="btn-task-confirm">Confirm</button>
-          <button class="btn btn-sm btn-secondary" id="btn-task-cancel">Cancel</button>
+          <button class="btn btn-sm" id="btn-task-confirm" data-i18n="confirm">Confirm</button>
+          <button class="btn btn-sm btn-secondary" id="btn-task-cancel" data-i18n="cancel">Cancel</button>
         </div>
       </div>
     </div>
@@ -59,82 +59,89 @@
     <div id="screen-day" class="screen">
       <div class="header">
         <button class="btn-nav" id="day-prev">&#8592;</button>
-        <h2 id="day-title">Today</h2>
+        <h2 id="day-title" data-i18n="day_title_date">Today</h2>
         <button class="btn-nav" id="day-next">&#8594;</button>
       </div>
       <div id="day-entries" class="entries"></div>
       <div class="day-actions">
-        <button class="btn btn-add" id="btn-add-entry">+ Add Entry</button>
+        <button class="btn btn-add" id="btn-add-entry" data-i18n="add_entry">+ Add Entry</button>
       </div>
       <div id="add-entry-form" class="add-form hidden">
-        <input type="text" id="add-start" placeholder="Start (HH:MM)" inputmode="numeric">
-        <input type="text" id="add-end" placeholder="End (HH:MM)" inputmode="numeric">
-        <input type="text" id="add-comment" placeholder="Comment" autocomplete="off">
+        <input type="text" id="add-start" data-i18n-placeholder="placeholder_start" placeholder="Start (HH:MM)" inputmode="numeric">
+        <input type="text" id="add-end" data-i18n-placeholder="placeholder_end" placeholder="End (HH:MM)" inputmode="numeric">
+        <input type="text" id="add-comment" data-i18n-placeholder="placeholder_comment_short" placeholder="Comment" autocomplete="off">
         <div id="add-comment-suggestions" class="suggestions"></div>
         <div class="add-actions">
-          <button class="btn btn-sm" id="btn-add-save">Save</button>
-          <button class="btn btn-sm btn-secondary" id="btn-add-cancel">Cancel</button>
+          <button class="btn btn-sm" id="btn-add-save" data-i18n="save">Save</button>
+          <button class="btn btn-sm btn-secondary" id="btn-add-cancel" data-i18n="cancel">Cancel</button>
         </div>
       </div>
     </div>
 
     <div id="screen-reports" class="screen">
-      <div class="header"><h2>Reports</h2></div>
+      <div class="header"><h2 data-i18n="reports">Reports</h2></div>
       <div id="reports-content" class="reports-content"></div>
     </div>
 
     <div id="screen-settings" class="screen">
-      <div class="header"><h2>Settings</h2></div>
+      <div class="header"><h2 data-i18n="settings">Settings</h2></div>
       <div class="settings-list">
         <label class="setting-row">
-          <span>Disable Goals</span>
+          <span data-i18n="settings_disable_goals">Disable Goals</span>
           <input type="checkbox" id="setting-no-goal">
         </label>
         <label class="setting-row">
-          <span>Weekly Target (hours)</span>
+          <span data-i18n="settings_weekly_target">Weekly Target (hours)</span>
           <input type="number" id="setting-weekly" step="0.5" min="0">
         </label>
         <label class="setting-row">
-          <span>Yearly Target (hours)</span>
+          <span data-i18n="settings_yearly_target">Yearly Target (hours)</span>
           <input type="number" id="setting-yearly" step="10" min="0">
         </label>
         <label class="setting-row">
-          <span>Vacation Days</span>
+          <span data-i18n="settings_vacation_days">Vacation Days</span>
           <input type="number" id="setting-vacation" min="0" max="365">
         </label>
         <div class="setting-row">
-          <span>Show Daily</span>
+          <span data-i18n="settings_show_daily">Show Daily</span>
           <input type="checkbox" id="setting-show-daily">
         </div>
         <div class="setting-row">
-          <span>Show Weekly</span>
+          <span data-i18n="settings_show_weekly">Show Weekly</span>
           <input type="checkbox" id="setting-show-weekly">
         </div>
         <div class="setting-row">
-          <span>Show Monthly</span>
+          <span data-i18n="settings_show_monthly">Show Monthly</span>
           <input type="checkbox" id="setting-show-monthly">
         </div>
         <div class="setting-row">
-          <span>Show Yearly</span>
+          <span data-i18n="settings_show_yearly">Show Yearly</span>
           <input type="checkbox" id="setting-show-yearly">
         </div>
         <div class="setting-row" style="flex-direction:column;align-items:stretch;gap:10px">
-          <span style="font-weight:600;font-size:0.95rem">Theme</span>
+          <span style="font-weight:600;font-size:0.95rem" data-i18n="settings_theme">Theme</span>
           <div class="theme-tabs" id="theme-tabs">
-            <button class="theme-tab active" data-theme="system">System</button>
-            <button class="theme-tab" data-theme="light">Light</button>
-            <button class="theme-tab" data-theme="dark">Dark</button>
+            <button class="theme-tab active" data-theme="system" data-i18n="settings_theme_system">System</button>
+            <button class="theme-tab" data-theme="light" data-i18n="settings_theme_light">Light</button>
+            <button class="theme-tab" data-theme="dark" data-i18n="settings_theme_dark">Dark</button>
           </div>
         </div>
-        <button class="btn" id="btn-save-settings">Save Settings</button>
+        <div class="setting-row" style="flex-direction:column;align-items:stretch;gap:10px">
+          <span style="font-weight:600;font-size:0.95rem">Language</span>
+          <div class="theme-tabs" id="lang-tabs">
+            <button class="theme-tab active" data-lang="en">English</button>
+            <button class="theme-tab" data-lang="da">Dansk</button>
+          </div>
+        </div>
+        <button class="btn" id="btn-save-settings" data-i18n="save_settings">Save Settings</button>
       </div>
-      <div class="header" style="margin-top:24px"><h2>Data</h2></div>
+      <div class="header" style="margin-top:24px"><h2 data-i18n="settings_data">Data</h2></div>
       <div class="settings-list">
-        <button class="btn btn-secondary" id="btn-export-csv">Export CSV</button>
-        <button class="btn btn-secondary" id="btn-export-json" style="margin-top:8px">Export JSON (Backup)</button>
-        <button class="btn btn-secondary" id="btn-import" style="margin-top:8px">Import JSON (Restore)</button>
+        <button class="btn btn-secondary" id="btn-export-csv" data-i18n="settings_export_csv">Export CSV</button>
+        <button class="btn btn-secondary" id="btn-export-json" style="margin-top:8px" data-i18n="settings_export_json">Export JSON (Backup)</button>
+        <button class="btn btn-secondary" id="btn-import" style="margin-top:8px" data-i18n="settings_import_json">Import JSON (Restore)</button>
         <input type="file" id="import-file" accept=".json" style="display:none">
-        <button class="btn btn-danger" id="btn-reset-data" style="margin-top:24px">Reset All Data</button>
+        <button class="btn btn-danger" id="btn-reset-data" style="margin-top:24px" data-i18n="settings_reset_data">Reset All Data</button>
       </div>
     </div>
   </div>
@@ -142,24 +149,25 @@
   <nav id="bottom-nav" class="bottom-nav">
     <button class="nav-item active" data-screen="timer">
       <span class="nav-icon">&#x23F1;</span>
-      <span class="nav-label">Timer</span>
+      <span class="nav-label" data-i18n="timer">Timer</span>
     </button>
     <button class="nav-item" data-screen="day">
       <span class="nav-icon">&#x1F4C5;</span>
-      <span class="nav-label">Day</span>
+      <span class="nav-label" data-i18n="day">Day</span>
     </button>
     <button class="nav-item" data-screen="reports">
       <span class="nav-icon">&#x1F4CA;</span>
-      <span class="nav-label">Reports</span>
+      <span class="nav-label" data-i18n="reports">Reports</span>
     </button>
     <button class="nav-item" data-screen="settings">
       <span class="nav-icon">&#x2699;</span>
-      <span class="nav-label">Settings</span>
+      <span class="nav-label" data-i18n="settings">Settings</span>
     </button>
   </nav>
 </div>
 <script src="js/db.js"></script>
 <script src="js/engine.js"></script>
+<script src="js/i18n.js"></script>
 <script src="js/export.js"></script>
 <script src="js/app.js"></script>
 </body>

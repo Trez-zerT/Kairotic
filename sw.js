@@ -7,6 +7,7 @@ const PRECACHE = [
   'js/db.js',
   'js/engine.js',
   'js/export.js',
+  'js/i18n.js',
   'js/app.js',
   'icons/icon-192.png',
   'icons/icon-512.png',

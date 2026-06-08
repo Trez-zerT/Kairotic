@@ -41,7 +41,7 @@ function toastWithUndo(msg, undoLabel, onUndo, onCommit) {
     el.className = '';
     clearTimeout(_undoTimer); _undoTimer = null;
     _undoCommit = null;
-    try { await onUndo(); } catch (err) { toast('Undo failed', true); }
+    try { await onUndo(); } catch (err) { toast(t('toast_undo_failed'), true); }
   });
 
   _undoTimer = setTimeout(() => {
@@ -104,12 +104,12 @@ async function confirmStartTimer() {
     timerCommentEl.textContent = comment || 'work';
     document.getElementById('start-comment-selector').classList.add('hidden');
     document.getElementById('timer-controls-running').classList.remove('hidden');
-    timerStatus.textContent = 'RUNNING';
+    timerStatus.textContent = t('status_running');
     timerStatus.className = 'timer-status running';
     startTimerTick();
     haptic();
-    toast('Timer started');
-  } catch (e) { toast('Failed to start timer: ' + e.message, true); }
+    toast(t('toast_started'));
+  } catch (e) { toast(t('toast_failed_start') + ': ' + e.message, true); }
 }
 
 async function updateRecentComments(newComment) {
@@ -132,14 +132,14 @@ function updateTimerDisplay() {
   const m = Math.floor((elapsed % 3600) / 60);
   const s = elapsed % 60;
   timerDisplay.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-  timerStatus.textContent = status.paused ? 'PAUSED' : 'RUNNING';
+  timerStatus.textContent = status.paused ? t('status_paused') : t('status_running');
   timerStatus.className = 'timer-status ' + (status.paused ? 'paused' : 'running');
   state.timerPaused = status.paused;
   const totalSec = state.todayLoggedSec + elapsed;
   const th = Math.floor(totalSec / 3600);
   const tm = Math.floor((totalSec % 3600) / 60);
   const todayEl = document.getElementById('today-total');
-  todayEl.textContent = totalSec > 0 ? 'Today: ' + th + 'h ' + tm + 'm' : '';
+  todayEl.textContent = totalSec > 0 ? t('today') + ': ' + th + 'h ' + tm + 'm' : '';
 }
 
 function stopTimerTick() {
@@ -156,7 +156,7 @@ async function loadTodayTotal() {
   if (!state.timerRunning && sec > 0) {
     const h = Math.floor(sec / 3600);
     const m = Math.floor((sec % 3600) / 60);
-    todayEl.textContent = 'Today: ' + h + 'h ' + m + 'm';
+    todayEl.textContent = t('today') + ': ' + h + 'h ' + m + 'm';
   } else if (!state.timerRunning) {
     todayEl.textContent = '';
   }
@@ -171,7 +171,7 @@ async function stopTimer() {
     state.timerRunning = false; state.timerPaused = false;
     stopTimerTick();
     timerDisplay.textContent = '00:00:00';
-    timerStatus.textContent = 'Ready';
+    timerStatus.textContent = t('status_ready');
     timerStatus.className = 'timer-status';
     timerCommentEl.textContent = '';
     document.getElementById('timer-controls-start').classList.remove('hidden');
@@ -179,7 +179,7 @@ async function stopTimer() {
     if (entry && entry.comment) updateRecentComments(entry.comment);
     loadTodayTotal();
     haptic();
-    toastWithUndo(`Logged (${entry.duration})`, 'UNDO', async () => {
+    toastWithUndo(t('toast_stopped') + ' (' + entry.duration + ')', t('toast_undo_label'), async () => {
       await db.deleteEntry(entry.id);
       engine.state = savedState;
       await db.saveTimerState(savedState);
@@ -189,12 +189,12 @@ async function stopTimer() {
       document.getElementById('timer-controls-start').classList.add('hidden');
       document.getElementById('timer-controls-running').classList.remove('hidden');
       timerCommentEl.textContent = savedState.comment || 'work';
-      timerStatus.textContent = savedState.paused ? 'PAUSED' : 'RUNNING';
+      timerStatus.textContent = savedState.paused ? t('status_paused') : t('status_running');
       timerStatus.className = 'timer-status ' + (savedState.paused ? 'paused' : 'running');
       startTimerTick();
       loadTodayTotal();
     });
-  } catch (e) { toast('Failed to stop: ' + e.message, true); }
+  } catch (e) { toast(t('toast_failed_stop') + ': ' + e.message, true); }
 }
 
 function showTaskSelector() {
@@ -221,8 +221,8 @@ async function confirmTaskSwitch() {
     updateRecentComments(comment);
     hideTaskSelector();
     haptic();
-    toast('Task switched to: ' + comment);
-  } catch (e) { toast('Failed: ' + e.message, true); }
+    toast(t('toast_switched') + ': ' + comment);
+  } catch (e) { toast(t('toast_failed_action') + ': ' + e.message, true); }
 }
 
 document.getElementById('task-input').addEventListener('input', function() {
@@ -293,7 +293,7 @@ async function saveAddEntry() {
   const start = normalizeTime(document.getElementById('add-start').value);
   const end = normalizeTime(document.getElementById('add-end').value);
   const comment = document.getElementById('add-comment').value || 'work';
-  if (!end) { toast('End time required', true); return; }
+  if (!end) { toast(t('placeholder_end'), true); return; }
   if (!isHHMM(start) || !isHHMM(end)) { toast('Use HH:MM or HHMM format', true); return; }
 
   const dateStr = fmtDate(state.selectedDate);
@@ -310,10 +310,10 @@ async function saveAddEntry() {
   try {
     await db.replaceDayEntries(dateStr, existing);
     updateRecentComments(comment);
-    toast('Entry added');
+    toast(t('toast_entry_added'));
     toggleAddForm();
     refreshDayView();
-  } catch (e) { toast('Failed: ' + e.message, true); }
+  } catch (e) { toast(t('toast_failed_action') + ': ' + e.message, true); }
 }
 
 async function refreshDayView() {
@@ -326,14 +326,14 @@ async function refreshDayView() {
     renderDayEntries(entries, dateStr);
   } catch (err) {
     console.error('refreshDayView failed:', err);
-    document.getElementById('day-entries').innerHTML = '<div class="no-entries">Failed to load</div>';
+    document.getElementById('day-entries').innerHTML = '<div class="no-entries">' + t('day_failed_load') + '</div>';
   }
 }
 
 function renderDayEntries(entries, dateStr) {
   const container = document.getElementById('day-entries');
   if (!entries || entries.length === 0) {
-    container.innerHTML = '<div class="no-entries">No entries for this day.</div>';
+    container.innerHTML = '<div class="no-entries">' + t('day_no_entries') + '</div>';
     return;
   }
   container.innerHTML = '';
@@ -372,7 +372,7 @@ function renderDayEntries(entries, dateStr) {
     const m = Math.floor((totalSec % 3600) / 60);
     const totalRow = document.createElement('div');
     totalRow.className = 'day-total';
-    totalRow.textContent = 'Total: ' + (h > 0 ? h + 'h ' : '') + m + 'm';
+    totalRow.textContent = t('total') + ': ' + (h > 0 ? h + 'h ' : '') + m + 'm';
     container.appendChild(totalRow);
   }
 }
@@ -382,14 +382,14 @@ function openEditModal(entry, idx, dateStr) {
   overlay.className = 'modal-overlay';
   overlay.innerHTML = `
     <div class="modal">
-      <h3>Edit Entry</h3>
-      <input type="text" id="edit-start" value="${entry.start.slice(0,5)}" placeholder="Start (HH:MM)" inputmode="numeric">
-      <input type="text" id="edit-end" value="${entry.end.slice(0,5)}" placeholder="End (HH:MM)" inputmode="numeric">
-      <input type="text" id="edit-comment" value="${entry.comment}" placeholder="Comment">
+      <h3>${t('edit_title')}</h3>
+      <input type="text" id="edit-start" value="${entry.start.slice(0,5)}" placeholder="${t('placeholder_start')}" inputmode="numeric">
+      <input type="text" id="edit-end" value="${entry.end.slice(0,5)}" placeholder="${t('placeholder_end')}" inputmode="numeric">
+      <input type="text" id="edit-comment" value="${entry.comment}" placeholder="${t('placeholder_comment_edit')}">
       <div id="edit-comment-suggestions" class="suggestions"></div>
       <div class="modal-actions">
-        <button class="btn btn-sm" id="edit-save">Save</button>
-        <button class="btn btn-sm btn-secondary" id="edit-cancel">Cancel</button>
+        <button class="btn btn-sm" id="edit-save">${t('edit_save')}</button>
+        <button class="btn btn-sm btn-secondary" id="edit-cancel">${t('edit_cancel')}</button>
       </div>
     </div>`;
   document.body.appendChild(overlay);
@@ -416,10 +416,10 @@ function openEditModal(entry, idx, dateStr) {
       const dur = (et - st) / 1000;
       await db.updateEntry(existing[idx].id, { date: dateStr, start: st.toTimeString().slice(0,8), end: et.toTimeString().slice(0,8), duration: fmtDuration(dur), comment, createdAt: existing[idx].createdAt || new Date().toISOString() });
       updateRecentComments(comment);
-      toast('Entry updated');
+      toast(t('toast_entry_updated'));
       overlay.remove();
       refreshDayView();
-    } catch (e) { toast('Failed: ' + e.message, true); }
+    } catch (e) { toast(t('toast_failed_action') + ': ' + e.message, true); }
   });
   document.getElementById('edit-save').addEventListener('touchend', (e) => { e.stopPropagation(); });
 }
@@ -430,11 +430,11 @@ async function deleteEntry(idx, dateStr) {
     const entry = existing[idx];
     await db.deleteEntry(entry.id);
     refreshDayView();
-    toastWithUndo('Entry deleted', 'UNDO', async () => {
+    toastWithUndo(t('toast_entry_deleted'), t('toast_undo_label'), async () => {
       await db.addEntry({ date: entry.date, start: entry.start, end: entry.end, duration: entry.duration, comment: entry.comment, createdAt: entry.createdAt || new Date().toISOString() });
       refreshDayView();
     });
-  } catch (e) { toast('Failed: ' + e.message, true); }
+  } catch (e) { toast(t('toast_failed_action') + ': ' + e.message, true); }
 }
 
 const reportWindows = { daily: 5, weekly: 5, monthly: 12, yearly: 10 };
@@ -443,7 +443,7 @@ let reportSortMode = 0;
 
 async function refreshReports() {
   const container = document.getElementById('reports-content');
-  container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-dim)">Loading...</div>';
+  container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-dim)">' + t('reports_loading') + '</div>';
   try {
     const data = await engine.buildReports();
     const cfg = await db.getConfig();
@@ -455,10 +455,10 @@ async function refreshReports() {
       container.appendChild(gh);
     }
     const sections = [
-      { key: 'daily', label: 'Daily Totals', items: data.daily, target: cfg.weekly_target * 3600 * 1e9 },
-      { key: 'weekly', label: 'Weekly Totals', items: data.weekly, target: cfg.weekly_target * 3600 * 1e9 },
-      { key: 'monthly', label: 'Monthly Totals', items: data.monthly, target: cfg.weekly_target * 3600 * 52 / 12 * 1e9 },
-      { key: 'yearly', label: 'Yearly Totals', items: data.yearly, target: cfg.weekly_target * 3600 * 52 * 1e9 },
+      { key: 'daily', label: t('reports_daily'), items: data.daily, target: cfg.weekly_target * 3600 * 1e9 },
+      { key: 'weekly', label: t('reports_weekly'), items: data.weekly, target: cfg.weekly_target * 3600 * 1e9 },
+      { key: 'monthly', label: t('reports_monthly'), items: data.monthly, target: cfg.weekly_target * 3600 * 52 / 12 * 1e9 },
+      { key: 'yearly', label: t('reports_yearly'), items: data.yearly, target: cfg.weekly_target * 3600 * 52 * 1e9 },
     ];
 
     const renderReportSection = (s) => {
@@ -498,9 +498,9 @@ async function refreshReports() {
         div.appendChild(comments); body.appendChild(div);
       });
       const nav = document.createElement('div'); nav.className = 'report-page-nav';
-      const prevBtn = document.createElement('button'); prevBtn.className = 'btn-page-nav'; prevBtn.innerHTML = '◀ newer'; prevBtn.disabled = currentPage <= 1;
+      const prevBtn = document.createElement('button'); prevBtn.className = 'btn-page-nav'; prevBtn.innerHTML = '\u25c0 ' + t('reports_newer'); prevBtn.disabled = currentPage <= 1;
       prevBtn.addEventListener('click', (e) => { e.stopPropagation(); reportOffsets[s.key] = Math.max(0, reportOffsets[s.key] - win); renderAllSections(); });
-      const nextBtn = document.createElement('button'); nextBtn.className = 'btn-page-nav'; nextBtn.innerHTML = 'older ▶'; nextBtn.disabled = currentPage >= totalPages;
+      const nextBtn = document.createElement('button'); nextBtn.className = 'btn-page-nav'; nextBtn.innerHTML = t('reports_older') + ' \u25b6'; nextBtn.disabled = currentPage >= totalPages;
       nextBtn.addEventListener('click', (e) => { e.stopPropagation(); reportOffsets[s.key] = Math.min(s.items.length - win, reportOffsets[s.key] + win); if (reportOffsets[s.key] < 0) reportOffsets[s.key] = 0; renderAllSections(); });
       const pageLabel = document.createElement('span'); pageLabel.className = 'page-label'; pageLabel.textContent = `${currentPage}/${totalPages}`;
       nav.appendChild(prevBtn); nav.appendChild(pageLabel); nav.appendChild(nextBtn); body.appendChild(nav);
@@ -514,15 +514,15 @@ async function refreshReports() {
       if (!cfg.no_goal) {
         const gh = document.createElement('div');
         gh.style.cssText = 'text-align:center;padding:12px;background:var(--surface);border-radius:var(--radius);margin-bottom:8px';
-        gh.innerHTML = `<strong>Goal: ${cfg.weekly_target.toFixed(1)}h/week</strong>`;
+      gh.innerHTML = '<strong>' + t('reports_goal_prefix') + ': ' + cfg.weekly_target.toFixed(1) + 'h/week</strong>';
         container.appendChild(gh);
       }
       let rendered = 0;
       sections.forEach(s => { const el = renderReportSection(s); if (el) { container.appendChild(el); rendered++; } });
-      if (rendered === 0) container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-dim)">No logs yet.</div>';
+      if (rendered === 0) container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-dim)">' + t('reports_no_logs') + '</div>';
     };
     renderAllSections();
-  } catch { container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--red)">Failed to load reports</div>'; }
+  } catch { container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--red)">' + t('day_failed_load') + '</div>'; }
 }
 
 async function loadSettings() {
@@ -536,7 +536,7 @@ async function loadSettings() {
     document.getElementById('setting-show-weekly').checked = cfg.show_weekly;
     document.getElementById('setting-show-monthly').checked = cfg.show_monthly;
     document.getElementById('setting-show-yearly').checked = cfg.show_yearly;
-  } catch { toast('Failed to load settings', true); }
+  } catch { toast(t('toast_failed_settings'), true); }
 }
 
 document.getElementById('btn-save-settings').addEventListener('click', async () => {
@@ -551,8 +551,8 @@ document.getElementById('btn-save-settings').addEventListener('click', async () 
       show_monthly: document.getElementById('setting-show-monthly').checked,
       show_yearly: document.getElementById('setting-show-yearly').checked,
     });
-    toast('Settings saved');
-  } catch (e) { toast('Failed to save: ' + e.message, true); }
+    toast(t('toast_settings_saved'));
+  } catch (e) { toast(t('toast_failed_save'), true); }
 });
 
 document.getElementById('btn-export-csv').addEventListener('click', () => xport.exportCSV());
@@ -594,6 +594,19 @@ function applyTheme(theme) {
   }
 }
 
+(function initLang() {
+  setLang(currentLang);
+  document.querySelectorAll('#lang-tabs .theme-tab').forEach(tab => {
+    if (tab.dataset.lang === currentLang) tab.classList.add('active');
+    else tab.classList.remove('active');
+    tab.addEventListener('click', () => {
+      setLang(tab.dataset.lang);
+      document.querySelectorAll('#lang-tabs .theme-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+})();
+
 (async function() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
@@ -605,7 +618,7 @@ function applyTheme(theme) {
     timerCommentEl.textContent = status.comment || 'work';
     document.getElementById('timer-controls-start').classList.add('hidden');
     document.getElementById('timer-controls-running').classList.remove('hidden');
-    timerStatus.textContent = status.paused ? 'PAUSED' : 'RUNNING';
+  timerStatus.textContent = status.paused ? t('status_paused') : t('status_running');
     timerStatus.className = 'timer-status ' + (status.paused ? 'paused' : 'running');
     startTimerTick();
   }
@@ -649,14 +662,14 @@ document.getElementById('screens').addEventListener('click', (e) => {
 })();
 
 document.getElementById('btn-reset-data').addEventListener('click', async () => {
-  if (!confirm('Delete ALL time entries, settings, and data? This cannot be undone.')) return;
+  if (!confirm(t('settings_reset_confirm'))) return;
   try {
     const d = await openDB();
     const tx = d.transaction(['entries', 'config', 'comments', 'timerState'], 'readwrite');
     await Promise.all(['entries', 'config', 'comments', 'timerState'].map(s => new Promise(r => { tx.objectStore(s).clear().onsuccess = r; })));
-    toast('All data cleared');
+    toast(t('toast_data_cleared'));
     setTimeout(() => location.reload(), 800);
-  } catch (e) { toast('Failed: ' + e.message, true); }
+  } catch (e) { toast(t('toast_failed_action') + ': ' + e.message, true); }
 });
 
 (function installBanner() {
