@@ -616,8 +616,9 @@ function applyTheme(theme) {
     const persisted = await navigator.storage.persisted();
     if (!persisted) {
       const granted = await navigator.storage.persist();
-      if (!granted) {
-        toast('Data may be cleared under low storage. Export a backup in Settings.', true);
+      if (!granted && !sessionStorage.getItem('kairotic-storage-warned')) {
+        sessionStorage.setItem('kairotic-storage-warned', '1');
+        toast(t('toast_failed_save') + ': ' + 'Export a backup in Settings.', true);
       }
     }
   }
@@ -684,6 +685,7 @@ document.getElementById('btn-reset-data').addEventListener('click', async () => 
 });
 
 (function installBanner() {
+  if (window.matchMedia('(display-mode: standalone)').matches) return;
   let deferredPrompt = null;
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
@@ -704,6 +706,18 @@ document.getElementById('btn-reset-data').addEventListener('click', async () => 
   window.addEventListener('appinstalled', () => {
     document.getElementById('install-banner').classList.remove('show');
   });
+  setTimeout(() => {
+    if (!deferredPrompt && !document.getElementById('install-banner').classList.contains('show') && !sessionStorage.getItem('kairotic-banner-dismissed')) {
+      document.getElementById('install-banner').classList.add('show');
+      document.getElementById('install-btn').textContent = t('settings');
+      document.getElementById('install-btn').addEventListener('click', () => {
+        toast('Open in browser and tap Share > Add to Home Screen', true);
+      });
+      document.getElementById('install-dismiss').addEventListener('click', () => {
+        sessionStorage.setItem('kairotic-banner-dismissed', '1');
+      });
+    }
+  }, 3000);
 })();
 
 document.querySelectorAll('.btn').forEach(btn => {
