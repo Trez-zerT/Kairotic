@@ -447,19 +447,19 @@ async function refreshReports() {
   try {
     const data = await engine.buildReports();
     const cfg = await db.getConfig();
-    let weeklyTarget = cfg.weekly_target;
-    if (cfg.prefer_yearly && cfg.yearly_target > 0) {
+    let weeklyTarget = cfg.weekly_target || 0;
+    if (cfg.yearly_target > 0) {
       const workWeeks = 52 - (cfg.vacation_days || 0) / 7;
       if (workWeeks > 0) weeklyTarget = cfg.yearly_target / workWeeks;
     }
     container.innerHTML = '';
-    if (!cfg.no_goal) {
+    if (!cfg.no_goal && weeklyTarget > 0) {
       const gh = document.createElement('div');
       gh.style.cssText = 'text-align:center;padding:12px;background:var(--surface);border-radius:var(--radius);margin-bottom:8px';
-      const label = cfg.prefer_yearly && cfg.yearly_target > 0
-        ? cfg.yearly_target.toFixed(0) + 'h/yr \u2192 ' + weeklyTarget.toFixed(1) + 'h/week'
+      const label = cfg.yearly_target > 0
+        ? cfg.yearly_target.toFixed(0) + 'h/yr, ' + (cfg.vacation_days || 0) + 'd off \u2192 ' + weeklyTarget.toFixed(1) + 'h/week'
         : weeklyTarget.toFixed(1) + 'h/week';
-      gh.innerHTML = `<strong>${t('reports_goal_prefix')}: ${label}</strong>`;
+      gh.innerHTML = '<strong>' + t('reports_goal_prefix') + ': ' + label + '</strong>';
       container.appendChild(gh);
     }
     const sections = [
@@ -519,11 +519,11 @@ async function refreshReports() {
 
     const renderAllSections = () => {
       container.innerHTML = '';
-      if (!cfg.no_goal) {
+      if (!cfg.no_goal && weeklyTarget > 0) {
         const gh = document.createElement('div');
         gh.style.cssText = 'text-align:center;padding:12px;background:var(--surface);border-radius:var(--radius);margin-bottom:8px';
-        const label = cfg.prefer_yearly && cfg.yearly_target > 0
-          ? cfg.yearly_target.toFixed(0) + 'h/yr \u2192 ' + weeklyTarget.toFixed(1) + 'h/week'
+        const label = cfg.yearly_target > 0
+          ? cfg.yearly_target.toFixed(0) + 'h/yr, ' + (cfg.vacation_days || 0) + 'd off \u2192 ' + weeklyTarget.toFixed(1) + 'h/week'
           : weeklyTarget.toFixed(1) + 'h/week';
         gh.innerHTML = '<strong>' + t('reports_goal_prefix') + ': ' + label + '</strong>';
         container.appendChild(gh);
@@ -547,7 +547,6 @@ async function loadSettings() {
     document.getElementById('setting-show-weekly').checked = cfg.show_weekly;
     document.getElementById('setting-show-monthly').checked = cfg.show_monthly;
     document.getElementById('setting-show-yearly').checked = cfg.show_yearly;
-    document.getElementById('setting-prefer-yearly').checked = cfg.prefer_yearly || false;
   } catch { toast(t('toast_failed_settings'), true); }
 }
 
@@ -562,7 +561,6 @@ document.getElementById('btn-save-settings').addEventListener('click', async () 
       show_weekly: document.getElementById('setting-show-weekly').checked,
       show_monthly: document.getElementById('setting-show-monthly').checked,
       show_yearly: document.getElementById('setting-show-yearly').checked,
-      prefer_yearly: document.getElementById('setting-prefer-yearly').checked,
     });
     toast(t('toast_settings_saved'));
   } catch (e) { toast(t('toast_failed_save'), true); }

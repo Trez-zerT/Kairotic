@@ -90,7 +90,7 @@ const db = {
     const d = await openDB();
     return new Promise((resolve, reject) => {
       const req = d.transaction('config', 'readonly').objectStore('config').get('config');
-      req.onsuccess = () => resolve(req.result || { weekly_target: 40, no_goal: false, show_daily: true, show_weekly: true, show_monthly: true, show_yearly: true, yearly_target: 0, vacation_days: 0 });
+      req.onsuccess = () => resolve(req.result || { weekly_target: 0, no_goal: false, show_daily: true, show_weekly: true, show_monthly: true, show_yearly: true, yearly_target: 0, vacation_days: 0 });
       req.onerror = () => reject(req.error);
     });
   },
