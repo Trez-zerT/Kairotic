@@ -595,6 +595,9 @@ function applyTheme(theme) {
 }
 
 (async function() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
   await engine.init();
   const status = engine.getStatus();
   if (status.running) {
