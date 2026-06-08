@@ -447,10 +447,12 @@ async function refreshReports() {
   try {
     const data = await engine.buildReports();
     const cfg = await db.getConfig();
+    console.log('report config:', JSON.stringify({ wy: cfg.weekly_target, yy: cfg.yearly_target, vd: cfg.vacation_days, ng: cfg.no_goal }));
     let weeklyTarget = cfg.weekly_target || 0;
     if (cfg.yearly_target > 0) {
       const workWeeks = 52 - (cfg.vacation_days || 0) / 7;
       if (workWeeks > 0) weeklyTarget = cfg.yearly_target / workWeeks;
+      console.log('derived weekly:', weeklyTarget, 'from:', cfg.yearly_target, '/', workWeeks);
     }
     container.innerHTML = '';
     if (!cfg.no_goal && weeklyTarget > 0) {
@@ -539,6 +541,7 @@ async function refreshReports() {
 async function loadSettings() {
   try {
     const cfg = await db.getConfig();
+    console.log('loaded config:', JSON.stringify({ wy: cfg.weekly_target, yy: cfg.yearly_target, vd: cfg.vacation_days, ng: cfg.no_goal }));
     document.getElementById('setting-no-goal').checked = cfg.no_goal;
     document.getElementById('setting-weekly').value = cfg.weekly_target;
     document.getElementById('setting-yearly').value = cfg.yearly_target || 0;
@@ -552,7 +555,7 @@ async function loadSettings() {
 
 document.getElementById('btn-save-settings').addEventListener('click', async () => {
   try {
-    await db.saveConfig({
+    const config = {
       weekly_target: parseFloat(document.getElementById('setting-weekly').value) || 0,
       no_goal: document.getElementById('setting-no-goal').checked,
       yearly_target: parseFloat(document.getElementById('setting-yearly').value) || 0,
@@ -561,7 +564,9 @@ document.getElementById('btn-save-settings').addEventListener('click', async () 
       show_weekly: document.getElementById('setting-show-weekly').checked,
       show_monthly: document.getElementById('setting-show-monthly').checked,
       show_yearly: document.getElementById('setting-show-yearly').checked,
-    });
+    };
+    console.log('saving config:', JSON.stringify(config));
+    await db.saveConfig(config);
     toast(t('toast_settings_saved'));
   } catch (e) { toast(t('toast_failed_save'), true); }
 });
