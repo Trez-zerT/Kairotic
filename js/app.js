@@ -611,6 +611,17 @@ function applyTheme(theme) {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
+
+  if (navigator.storage && navigator.storage.persist) {
+    const persisted = await navigator.storage.persisted();
+    if (!persisted) {
+      const granted = await navigator.storage.persist();
+      if (!granted) {
+        toast('Data may be cleared under low storage. Export a backup in Settings.', true);
+      }
+    }
+  }
+
   await engine.init();
   const status = engine.getStatus();
   if (status.running) {
